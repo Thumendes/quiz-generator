@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Quiz {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  thumbnail   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions Question[]
+  results   Result[]
+
+  @@map("quizzes")
+}
+
+model Question {
+  id        String   @id
+  title     String
+  image     String?
+  quizId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quiz    Quiz     @relation(fields: [quizId], references: [id])
+  options Option[]
+
+  @@map("questions")
+}
+
+model Option {
+  id         String   @id
+  title      String
+  isCorrect  Boolean
+  questionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@map("options")
+}
+
+model Result {
+  id        String   @id @default(cuid())
+  quizId    String
+  name      String
+  score     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quiz Quiz @relation(fields: [quizId], references: [id])
+
+  @@map("results")
+}
